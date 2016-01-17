@@ -1,11 +1,31 @@
 Consul Template Changelog
 =========================
 
-## v0.13.0.dev (Unreleased)
+## v0.13.0 (Unreleased)
+
+## v0.12.2 (January 15, 2016)
+
+BUG FIXES:
+
+  * Fixed an issue when running as PID 1 in a Docker container where Consul
+    Template could consume CPU and spuriously think its spwaned sub-processes
+    had failed [GH-511]
+
+## v0.12.1 (January 7, 2016)
 
 IMPROVEMENTS:
 
   * Add support for math operations on uint types [GH-483, GH-484]
+  * Make check information available through health service [GH-490]
+
+BUG FIXES:
+
+  * Store vault data on the dependency and handle an error where a failed
+    lease renewal would result in `<no data>` in the rendered template. Please
+    note, there is a bug in Vault 0.4 with respect to lease renewals that makes
+    it inoperable with Consul Template. Please either use Vault 0.3 or wait
+    until Vault 0.5 is released (the bug has already been fixed on master).
+    [GH-468, GH-493, GH-504]
 
 
 ## v0.12.0 (December 10, 2015)

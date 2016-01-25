@@ -103,6 +103,9 @@ func (w *Watcher) Add(d dep.Dependency) (bool, error) {
 
 	log.Printf("[DEBUG] (watcher) %s starting", d.Display())
 
+	if err = v.register(); err != nil{
+		log.Printf("[ERROR] (watcher) %s dependency register failed", d.Display())
+	}
 	w.depViewMap[d.HashCode()] = v
 	go v.poll(w.DataCh, w.ErrCh)
 

@@ -123,7 +123,18 @@ func (v *View) fetch(doneCh chan<- struct{}, errCh chan<- error) {
 			WaitTime:   defaultWaitTime,
 			WaitIndex:  v.LastIndex,
 		}
-		data, rm, err := v.Dependency.Fetch(v.config.Clients, opts)
+		var data interface{}
+		var rm *dep.ResponseMetadata
+		var err error
+
+		if factDep, ok := v.Dependency.(*dep.StoreKey); ok {
+			data, rm, err = factDep.Find(v.config.Clients, opts)
+		}else{
+			data, rm, err = v.Dependency.Fetch(v.config.Clients, opts)
+		}
+
+//		data, rm, err = v.Dependency.Fetch(v.config.Clients, opts)
+
 		if err != nil {
 			errCh <- err
 			return

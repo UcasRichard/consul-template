@@ -15,6 +15,7 @@ import (
 	"github.com/hashicorp/consul-template/logging"
 	"github.com/hashicorp/consul-template/watch"
 	"github.com/hashicorp/go-reap"
+	"participant"
 )
 
 // Exit codes are int values that represent an exit code for a particular error.
@@ -118,6 +119,10 @@ func (cli *CLI) Run(args []string) int {
 	}
 	go runner.Start()
 
+	//Initial Propagation Server
+	proServer, err := participant.NewPropagationServer(nil)
+	go proServer.Start()
+
 	// Listen for signals
 	signalCh := make(chan os.Signal, 1)
 	signal.Notify(signalCh,
@@ -138,6 +143,7 @@ func (cli *CLI) Run(args []string) int {
 			case syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT:
 				fmt.Fprintf(cli.errStream, "Received interrupt, cleaning up...\n")
 				runner.Stop()
+				proServer.Stop()
 				return ExitCodeInterrupt
 			case syscall.SIGHUP:
 				fmt.Fprintf(cli.errStream, "Received HUP, reloading configuration...\n")

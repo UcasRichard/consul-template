@@ -6,6 +6,7 @@ import (
 	"time"
 
 	dep "github.com/hashicorp/consul-template/dependency"
+	"fmt"
 )
 
 // testRetryFunc is a function specifically for tests that has a 0-time retry.
@@ -272,5 +273,29 @@ func TestStop_stopsPolling(t *testing.T) {
 		t.Error(err)
 	case <-view.stopCh:
 		// Successfully stopped
+	}
+}
+
+func TestRegister_Success(t *testing.T){
+	config, dep := defaultWatcherConfig, &dep.StoreKey{Path: "foo"}
+
+	clients, consul := testConsulServer(t)
+	defer consul.Stop()
+
+	config.Clients = clients
+
+	view, _ := NewView(config, dep)
+	if err := view.register(); err != nil {
+		t.Errorf("expect no error, but %s", err)
+	}
+	values := consul.ListKV("listener/foo")
+	for _, value := range values  {
+		fact := consul.GetKV(value)
+		ip, _ := externalIP()
+		expected := ip + ":" + REGISTER_PORT
+		if string(fact) != expected {
+			t.Errorf("expected: %s, fact is : %s", expected, fact)
+		}
+		fmt.Println(string(fact))
 	}
 }

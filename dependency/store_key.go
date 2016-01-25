@@ -37,7 +37,9 @@ func (d *StoreKey) Fetch(clients *ClientSet, opts *QueryOptions) (interface{}, *
 	}
 
 	store := consul.KV()
+	log.Printf("[DEBUG] starting query consul")
 	pair, qm, err := store.Get(d.Path, consulOpts)
+	log.Printf("[DEBUG] end query consul")
 	if err != nil {
 		return "", nil, fmt.Errorf("store key: error fetching: %s", err)
 	}
